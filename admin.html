@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Панель — ПЕКАРНЯ DAG</title>
+<meta name="theme-color" content="#1D2BD4">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='28' fill='%231D2BD4'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle'%3E🥐%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="admin">
+
+<!-- Вход -->
+<section class="gate" id="gate">
+  <div class="gate-card" id="gateCard">
+    <div class="logo" aria-hidden="true">DAG</div>
+    <h1>Панель<br>ПЕКАРНЯ DAG</h1>
+    <p class="lead" id="gateLead">Вход только для администратора.</p>
+    <form class="form" id="loginForm" novalidate>
+      <label for="lEmail">Почта</label>
+      <input class="field" id="lEmail" type="email" autocomplete="username" required>
+      <label for="lPass">Пароль</label>
+      <input class="field" id="lPass" type="password" autocomplete="current-password" required>
+      <p class="form-err" id="loginErr" role="alert"></p>
+      <button class="btn blue big" type="submit" id="loginBtn">Войти</button>
+    </form>
+  </div>
+</section>
+
+<!-- Панель (показывается только после проверки прав) -->
+<div id="panel" hidden>
+  <header class="a-nav">
+    <div class="container">
+      <a class="brand" href="/" title="Открыть сайт">
+        <span class="logo" aria-hidden="true">DAG</span>
+        <span class="t">Панель</span>
+      </a>
+      <nav class="a-tabs" role="tablist">
+        <button role="tab" type="button" data-tab="orders" aria-selected="true">Заказы<span class="count" id="newCount" hidden>0</span></button>
+        <button role="tab" type="button" data-tab="menu" aria-selected="false">Меню</button>
+      </nav>
+      <div class="a-actions">
+        <button class="btn ghost small" type="button" id="soundBtn" aria-pressed="true">🔔 Звук включён</button>
+        <button class="btn ghost small" type="button" id="logoutBtn">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="a-main">
+    <div class="container">
+
+      <!-- Заказы -->
+      <section id="tab-orders">
+        <div class="stats">
+          <div class="stat"><b id="stNew">0</b><span>новых сейчас</span></div>
+          <div class="stat"><b id="stToday">0</b><span>заказов сегодня</span></div>
+          <div class="stat"><b id="stSum">0</b><span>сумма за сегодня</span></div>
+        </div>
+        <div class="filters" id="filters">
+          <button class="cat" type="button" data-f="active" aria-pressed="true">Активные</button>
+          <button class="cat" type="button" data-f="done" aria-pressed="false">Выданные</button>
+          <button class="cat" type="button" data-f="all" aria-pressed="false">Все</button>
+        </div>
+        <div class="orders" id="orders"></div>
+      </section>
+
+      <!-- Меню -->
+      <section id="tab-menu" hidden>
+        <div class="panel">
+          <h2 id="formTitle">Новая позиция</h2>
+          <form class="form" id="prodForm" novalidate>
+            <div class="two">
+              <div><label for="pName">Название</label><input class="field" id="pName" maxlength="120" placeholder="Круассан с миндалём"></div>
+              <div><label for="pPrice">Цена</label><input class="field" id="pPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="250"></div>
+            </div>
+            <div class="two">
+              <div><label for="pCat">Категория</label><input class="field" id="pCat" list="catList" maxlength="40" value="Выпечка"><datalist id="catList"></datalist></div>
+              <div><label for="pEmoji">Значок (если нет фото)</label><input class="field" id="pEmoji" maxlength="8" value="🥐"></div>
+            </div>
+            <label for="pDesc">Описание</label>
+            <textarea class="field" id="pDesc" maxlength="500" placeholder="Слоёный, с миндальным кремом, ещё тёплый"></textarea>
+            <label for="pFile">Фото</label>
+            <div class="preview">
+              <div class="pv" id="pPreview">🥐</div>
+              <div>
+                <input type="file" id="pFile" accept="image/*">
+                <label class="check" id="rmImgBox" hidden><input type="checkbox" id="pRmImg"> Убрать текущее фото</label>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" id="pAvail" checked> В наличии</label>
+            <p class="form-err" id="prodErr" role="alert"></p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn blue" type="submit" id="prodSave">Добавить в меню</button>
+              <button class="btn paper" type="button" id="prodCancel" hidden>Отмена</button>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Позиции в меню</h2>
+          <div class="mlist" id="mlist"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/supabase.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
